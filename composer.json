@@ -1,0 +1,20 @@
+{
+    "name": "typo3docs/rendering-bamboo",
+    "description": "Contains Console application for rendering at bamboo.",
+    "type": "project",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Daniel Siepmann",
+            "email": "coding@daniel-siepmann.de"
+        }
+    ],
+    "require": {
+        "symfony/console": "^4.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "TYPO3\\Documentation\\Rendering\\": "src/"
+        }
+    }
+}
