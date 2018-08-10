@@ -57,6 +57,7 @@ class PrepareDeploymentCommand extends Command
         }
 
         $this->generateDeploymentFile($outputFile, $this->generateDeploymentInfos());
+        $output->writeln('Generated: "' . $outputFile . '".');
     }
 
     protected function generateDeploymentInfos(): array
