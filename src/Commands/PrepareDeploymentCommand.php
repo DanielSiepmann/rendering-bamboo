@@ -46,14 +46,14 @@ class PrepareDeploymentCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $workingDir = rtrim($this->input->getArgument('workingDir'), '/') . '/';
+        $workingDir = rtrim($input->getArgument('workingDir'), '/') . '/';
         $composerJson = $workingDir . 'composer.json';
         if (!file_exists($composerJson)) {
             $output->writeln('Could not find composer.json in "' . $workingDir . '".');
             exit(1);
         }
 
-        $outputFile = $this->input->getArgument('targetFile');
+        $outputFile = $input->getArgument('targetFile');
         if (!is_dir(dirname($outputFile))) {
             $output->writeln('Path to deployment file does not exist: "' . $outputFile . '".');
             exit(1);
