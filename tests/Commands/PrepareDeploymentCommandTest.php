@@ -179,6 +179,21 @@ class PrepareDeploymentCommandTest extends TestCase
                     'version=10.1',
                 ]),
             ],
+            'System extension, types and plain version' => [
+                'composerJsonContent' => [
+                    'type' => 'typo3-cms-framework',
+                    'name' => 'typo3/cms-indexed-search',
+                ],
+                'versionString' => '10.1',
+                'expectedFileContent' => implode(PHP_EOL, [
+                    '#/bin/bash',
+                    'type_long=core-extension',
+                    'type_short=c',
+                    'vendor=typo3',
+                    'name=cms-indexed-search',
+                    'version=10.1',
+                ]),
+            ],
             '3rd Party extension, different type and patch level version is kept, while "v" prefix is removed' => [
                 'composerJsonContent' => [
                     'type' => 'typo3-cms-extension',
