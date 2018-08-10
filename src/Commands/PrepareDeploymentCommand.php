@@ -44,26 +44,41 @@ class PrepareDeploymentCommand extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        // Check for all external dependencies first
+
         $workingDir = rtrim($input->getArgument('workingDir'), '/') . '/';
         $composerJson = $workingDir . 'composer.json';
         if (!file_exists($composerJson)) {
             $output->writeln('Could not find composer.json in "' . $workingDir . '".');
-            exit(1);
+            return 1;
         }
 
         $outputFile = $input->getArgument('targetFile');
         if (!is_dir(dirname($outputFile))) {
             $output->writeln('Path to deployment file does not exist: "' . $outputFile . '".');
-            exit(1);
+            return 1;
         }
 
-        $this->generateDeploymentFile($outputFile, $this->generateDeploymentInfos($composerJson));
-        $output->writeln('Generated: "' . $outputFile . '".');
+        // If everything is fine, we go ahead
+
+        try {
+            $this->generateDeploymentFile(
+                $outputFile,
+                $this->generateDeploymentInfos($composerJson, $input->getArgument('version'))
+            );
+            $output->writeln('Generated: "' . $outputFile . '".');
+
+            return 0;
+        } catch (\Exception $e) {
+            $output->writeln('<error>' . $e->getMessage() . '</error>');
+
+            return 2;
+        }
     }
 
-    protected function generateDeploymentInfos(string $composerJson): array
+    protected function generateDeploymentInfos(string $composerJson, string $version): array
     {
         $composerContent = json_decode(file_get_contents($composerJson), true);
         $deploymentInfos = [
@@ -72,6 +87,7 @@ class PrepareDeploymentCommand extends Command
             'vendor' => $this->getComposerVendor($composerContent),
             'name' => $this->getComposerName($composerContent),
         ];
+        $deploymentInfos['version'] = $this->getVersion($version, $deploymentInfos['type_short']);
 
         return $deploymentInfos;
     }
@@ -95,6 +111,7 @@ class PrepareDeploymentCommand extends Command
         if ($composerContent['type'] === 'typo3-cms-extension') {
             return 'extension';
         }
+
         if ($composerContent['type'] === 'typo3-cms-framework') {
             return 'core-extension';
         }
@@ -109,6 +126,7 @@ class PrepareDeploymentCommand extends Command
         if ($typeLong === 'extension') {
             return 'e';
         }
+
         if ($typeLong === 'core-extension') {
             return 'c';
         }
@@ -132,5 +150,39 @@ class PrepareDeploymentCommand extends Command
         }
 
         return explode('/', $composerContent['name'])[1];
+    }
+
+    /**
+     * Converts incoming version string to version string used in documentation.
+     */
+    protected function getVersion(string $versionString, string $typeShort): string
+    {
+        if (trim($versionString) === 'master') {
+            return 'latest';
+        }
+
+        // We do not keep the "v" prefix.
+        if (strtolower($versionString[0]) === 'v') {
+            $versionString = substr($versionString, 1);
+        }
+
+        // System extensions have further special handling.
+        if ($typeShort === 'c') {
+            return $this->getSystemExtensionVersion($versionString);
+        }
+
+        return $versionString;
+    }
+
+    /**
+     * For system extensions, we do not keep patch level documentations.
+     *
+     * We therefore only use the major and minor version parts of a version string.
+     */
+    protected function getSystemExtensionVersion(string $versionString): string
+    {
+        $versionParts = explode('.', $versionString);
+
+        return implode('.', array_slice($versionParts, 0, 2));
     }
 }
