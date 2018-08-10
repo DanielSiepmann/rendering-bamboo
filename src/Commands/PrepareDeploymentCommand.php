@@ -40,13 +40,16 @@ class PrepareDeploymentCommand extends Command
             ->setDescription('Prepares deployment, e.g. define some variables.')
 
             ->addArgument('targetFile', InputArgument::REQUIRED, 'Path to file containing the output.')
+            ->addArgument('workingDir', InputArgument::REQUIRED, 'Directory to work in.')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (!file_exists('composer.json')) {
-            $output->writeln('Could not find composer.json');
+        $workingDir = rtrim($this->input->getArgument('workingDir'), '/') . '/';
+        $composerJson = $workingDir . 'composer.json';
+        if (!file_exists($composerJson)) {
+            $output->writeln('Could not find composer.json in "' . $workingDir . '".');
             exit(1);
         }
 
@@ -56,13 +59,13 @@ class PrepareDeploymentCommand extends Command
             exit(1);
         }
 
-        $this->generateDeploymentFile($outputFile, $this->generateDeploymentInfos());
+        $this->generateDeploymentFile($outputFile, $this->generateDeploymentInfos($composerJson));
         $output->writeln('Generated: "' . $outputFile . '".');
     }
 
-    protected function generateDeploymentInfos(): array
+    protected function generateDeploymentInfos(string $composerJson): array
     {
-        $composerContent = json_decode(file_get_contents('composer.json'), true);
+        $composerContent = json_decode(file_get_contents($composerJson), true);
         $deploymentInfos = [
             'type_long' => $this->getTypeLong($composerContent),
             'type_short' => $this->getTypeShort($composerContent),
@@ -84,25 +87,25 @@ class PrepareDeploymentCommand extends Command
         file_put_contents($outputFile, implode($fileContent, PHP_EOL));
     }
 
-    protected function getTypeLong(array $composerFile): string
+    protected function getTypeLong(array $composerContent): string
     {
-        if (!isset($composerFile['type'])) {
+        if (!isset($composerContent['type'])) {
             throw new \Exception('No type defined.', 1532671586);
         }
 
-        if ($composerFile['type'] === 'typo3-cms-extension') {
+        if ($composerContent['type'] === 'typo3-cms-extension') {
             return 'extension';
         }
-        if ($composerFile['type'] === 'typo3-cms-framework') {
+        if ($composerContent['type'] === 'typo3-cms-framework') {
             return 'core-extension';
         }
 
         return '';
     }
 
-    protected function getTypeShort(array $composerFile): string
+    protected function getTypeShort(array $composerContent): string
     {
-        $typeLong = $this->getTypeLong($composerFile);
+        $typeLong = $this->getTypeLong($composerContent);
 
         if ($typeLong === 'extension') {
             return 'e';
@@ -114,22 +117,22 @@ class PrepareDeploymentCommand extends Command
         return '';
     }
 
-    protected function getComposerVendor(array $composerFile): string
+    protected function getComposerVendor(array $composerContent): string
     {
-        if (!isset($composerFile['name'])) {
+        if (!isset($composerContent['name'])) {
             throw new \Exception('No name defined.', 1532671586);
         }
 
-        return explode('/', $composerFile['name'])[0];
+        return explode('/', $composerContent['name'])[0];
     }
 
-    protected function getComposerName(array $composerFile): string
+    protected function getComposerName(array $composerContent): string
     {
-        if (!isset($composerFile['name'])) {
+        if (!isset($composerContent['name'])) {
             throw new \Exception('No name defined.', 1532671586);
         }
 
-        return explode('/', $composerFile['name'])[1];
+        return explode('/', $composerContent['name'])[1];
     }
 
     protected function getVersion(): string
