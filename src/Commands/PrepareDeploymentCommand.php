@@ -71,7 +71,6 @@ class PrepareDeploymentCommand extends Command
             'type_short' => $this->getTypeShort($composerContent),
             'vendor' => $this->getComposerVendor($composerContent),
             'name' => $this->getComposerName($composerContent),
-            'version' => $this->getVersion(),
         ];
 
         return $deploymentInfos;
@@ -133,11 +132,5 @@ class PrepareDeploymentCommand extends Command
         }
 
         return explode('/', $composerContent['name'])[1];
-    }
-
-    protected function getVersion(): string
-    {
-        // TODO: Fetch from input?! From bamboo, environment.
-        return '1.0.0';
     }
 }
