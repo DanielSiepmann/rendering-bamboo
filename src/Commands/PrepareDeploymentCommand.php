@@ -41,6 +41,7 @@ class PrepareDeploymentCommand extends Command
 
             ->addArgument('targetFile', InputArgument::REQUIRED, 'Path to file containing the output.')
             ->addArgument('workingDir', InputArgument::REQUIRED, 'Directory to work in.')
+            ->addArgument('version', InputArgument::REQUIRED, 'The rendered version, e.g. "master" or "v10.5.2"')
         ;
     }
 
@@ -116,7 +117,7 @@ class PrepareDeploymentCommand extends Command
             return 'core-extension';
         }
 
-        return '';
+        throw new \Exception('Unkown type defined: "' . $composerContent['type'] . '".', 1533915182);
     }
 
     protected function getTypeShort(array $composerContent): string
@@ -131,12 +132,12 @@ class PrepareDeploymentCommand extends Command
             return 'c';
         }
 
-        return '';
+        throw new \Exception('Unkown long type defined: "' . $typeLong . '".', 1533915213);
     }
 
     protected function getComposerVendor(array $composerContent): string
     {
-        if (!isset($composerContent['name'])) {
+        if (!isset($composerContent['name']) || trim($composerContent['name']) === '') {
             throw new \Exception('No name defined.', 1532671586);
         }
 
@@ -149,7 +150,13 @@ class PrepareDeploymentCommand extends Command
             throw new \Exception('No name defined.', 1532671586);
         }
 
-        return explode('/', $composerContent['name'])[1];
+        $name = explode('/', $composerContent['name'])[1] ?? '';
+
+        if (trim($name) === '') {
+            throw new \Exception('No name defined.', 1533915440);
+        }
+
+        return $name;
     }
 
     /**
@@ -170,6 +177,8 @@ class PrepareDeploymentCommand extends Command
         if ($typeShort === 'c') {
             return $this->getSystemExtensionVersion($versionString);
         }
+
+        // TODO: Define behaviour for unkown versions?
 
         return $versionString;
     }

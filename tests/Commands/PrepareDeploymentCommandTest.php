@@ -278,8 +278,34 @@ class PrepareDeploymentCommandTest extends TestCase
                 ],
                 'expectedMessage' => '<error>No name defined.</error>',
             ],
+            'Type unkown' => [
+                'composerJsonContent' => [
+                    'name' => 'typo3/cms-indexed-search',
+                    'type' => 'package',
+                ],
+                'expectedMessage' => '<error>Unkown type defined: "package".</error>',
+            ],
+            'Vendor undefined' => [
+                'composerJsonContent' => [
+                    'name' => '',
+                    'type' => 'typo3-cms-framework',
+                ],
+                'expectedMessage' => '<error>No name defined.</error>',
+            ],
+            'Name undefined' => [
+                'composerJsonContent' => [
+                    'name' => 'no-vendor',
+                    'type' => 'typo3-cms-framework',
+                ],
+                'expectedMessage' => '<error>No name defined.</error>',
+            ],
+            'Name undefined' => [
+                'composerJsonContent' => [
+                    'name' => 'no-vendor/',
+                    'type' => 'typo3-cms-framework',
+                ],
+                'expectedMessage' => '<error>No name defined.</error>',
+            ],
         ];
     }
-
-    // TODO: Test invalid values
 }
