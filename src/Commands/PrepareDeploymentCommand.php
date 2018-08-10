@@ -22,6 +22,7 @@ namespace TYPO3\Documentation\Rendering\Commands;
  */
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -32,13 +33,13 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class PrepareDeploymentCommand extends Command
 {
-    protected $deploymentFile = '/home/result/deployment_infos.sh';
-
     protected function configure()
     {
         $this
             ->setName('prepare:deployment')
             ->setDescription('Prepares deployment, e.g. define some variables.')
+
+            ->addArgument('targetFile', InputArgument::REQUIRED, 'Path to file containing the output.')
         ;
     }
 
@@ -48,12 +49,14 @@ class PrepareDeploymentCommand extends Command
             $output->writeln('Could not find composer.json');
             exit(1);
         }
-        if (!is_dir(dirname($this->deploymentFile))) {
-            $output->writeln('Path to deployment file does not exist: "' . $this->deploymentFile . '".');
+
+        $outputFile = $this->input->getArgument('targetFile');
+        if (!is_dir(dirname($outputFile))) {
+            $output->writeln('Path to deployment file does not exist: "' . $outputFile . '".');
             exit(1);
         }
 
-        $this->generateDeploymentFile($this->generateDeploymentInfos());
+        $this->generateDeploymentFile($outputFile, $this->generateDeploymentInfos());
     }
 
     protected function generateDeploymentInfos(): array
@@ -70,14 +73,14 @@ class PrepareDeploymentCommand extends Command
         return $deploymentInfos;
     }
 
-    protected function generateDeploymentFile(array $deploymentInfos)
+    protected function generateDeploymentFile(string $outputFile, array $deploymentInfos)
     {
         $fileContent = ['#/bin/bash'];
         foreach ($deploymentInfos as $key => $value) {
             $fileContent[] = $key . '=' . $value;
         }
 
-        file_put_contents($this->deploymentFile, implode($fileContent, PHP_EOL));
+        file_put_contents($outputFile, implode($fileContent, PHP_EOL));
     }
 
     protected function getTypeLong(array $composerFile): string
