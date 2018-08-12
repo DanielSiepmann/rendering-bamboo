@@ -25,6 +25,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use TYPO3\Documentation\Search\Indexer\ManualIndexer;
 
 /**
  * Indexes a single manual.
@@ -34,15 +35,30 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class IndexManualCommand extends Command
 {
+    /**
+     * @var ManualIndexer
+     */
+    protected $manualIndexer;
+
     protected function configure()
     {
         $this
             ->setName('index:manual')
             ->setDescription('Index a single manual.')
+
+            ->addArgument('manualUrl', InputArgument::REQUIRED, 'The full url to the manual start page, which is "some/path/" without Index.html or anything else.')
         ;
+
+        $this->manualIndexer = new ManualIndexer();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $manualUrl = $input->getArgument('manualUrl');
+
+        $this->manualIndexer->reindexManual($manualUrl);
+
+        $output->writeln('Finished indexing of "' . $manualUrl . '".');
+        return 0;
     }
 }
