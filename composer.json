@@ -18,7 +18,7 @@
     },
     "autoload": {
         "psr-4": {
-            "TYPO3\\Documentation\\Rendering\\": "src/"
+            "TYPO3\\Documentation\\": "src/"
         }
     }
 }

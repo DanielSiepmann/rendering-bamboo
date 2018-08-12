@@ -5,7 +5,9 @@ require __DIR__ . '/vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
 use TYPO3\Documentation\Rendering\Commands\PrepareDeploymentCommand;
+use TYPO3\Documentation\Search\Commands\IndexManualCommand;
 
 $application = new Application();
 $application->add(new PrepareDeploymentCommand());
+$application->add(new IndexManualCommand());
 $application->run();
