@@ -109,6 +109,10 @@ class PrepareDeploymentCommand extends Command
             throw new \Exception('No type defined.', 1532671586);
         }
 
+        if ($composerContent['type'] === 'typo3-cms-documentation') {
+            return 'manual';
+        }
+
         if ($composerContent['type'] === 'typo3-cms-framework') {
             return 'core-extension';
         }
@@ -123,6 +127,10 @@ class PrepareDeploymentCommand extends Command
     protected function getTypeShort(array $composerContent): string
     {
         $typeLong = $this->getTypeLong($composerContent);
+
+        if ($typeLong === 'manual') {
+            return 'm';
+        }
 
         if ($typeLong === 'core-extension') {
             return 'c';

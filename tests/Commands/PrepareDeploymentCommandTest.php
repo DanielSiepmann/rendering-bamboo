@@ -254,6 +254,21 @@ class PrepareDeploymentCommandTest extends TestCase
                     'version=10.1.2',
                 ]),
             ],
+            'TYPO3 Documentation manual' => [
+                'composerJsonContent' => [
+                    'type' => 'typo3-cms-documentation',
+                    'name' => 'typo3/reference-core-api',
+                ],
+                'versionString' => 'master',
+                'expectedFileContent' => implode(PHP_EOL, [
+                    '#/bin/bash',
+                    'type_long=manual',
+                    'type_short=m',
+                    'vendor=typo3',
+                    'name=reference-core-api',
+                    'version=latest',
+                ]),
+            ],
             'Branch "master" is mapped to "latest"' => [
                 'composerJsonContent' => [
                     'type' => 'typo3-cms-extension',
