@@ -284,6 +284,21 @@ class PrepareDeploymentCommandTest extends TestCase
                     'version=latest',
                 ]),
             ],
+            'Project Website is handled special' => [
+                'composerJsonContent' => [
+                    'type' => 'typo3-cms-documentation',
+                    'name' => 'typo3/docs-homepage',
+                ],
+                'versionString' => 'master',
+                'expectedFileContent' => implode(PHP_EOL, [
+                    '#/bin/bash',
+                    'type_long=homepage',
+                    'type_short=h',
+                    'vendor=typo3',
+                    'name=docs-homepage',
+                    'version=latest',
+                ]),
+            ],
         ];
     }
 

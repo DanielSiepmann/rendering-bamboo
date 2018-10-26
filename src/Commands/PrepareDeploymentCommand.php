@@ -109,6 +109,10 @@ class PrepareDeploymentCommand extends Command
             throw new \Exception('No type defined.', 1532671586);
         }
 
+        if (isset($composerContent['name']) && $composerContent['name'] === 'typo3/docs-homepage') {
+            return 'homepage';
+        }
+
         if ($composerContent['type'] === 'typo3-cms-documentation') {
             return 'manual';
         }
@@ -130,6 +134,10 @@ class PrepareDeploymentCommand extends Command
 
         if ($typeLong === 'manual') {
             return 'm';
+        }
+
+        if ($typeLong === 'homepage') {
+            return 'h';
         }
 
         if ($typeLong === 'core-extension') {
