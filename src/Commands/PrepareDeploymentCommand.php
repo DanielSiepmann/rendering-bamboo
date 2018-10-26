@@ -109,27 +109,27 @@ class PrepareDeploymentCommand extends Command
             throw new \Exception('No type defined.', 1532671586);
         }
 
-        if ($composerContent['type'] === 'typo3-cms-extension') {
-            return 'extension';
-        }
-
         if ($composerContent['type'] === 'typo3-cms-framework') {
             return 'core-extension';
         }
 
-        throw new \Exception('Unkown type defined: "' . $composerContent['type'] . '".', 1533915182);
+        if ($composerContent['type'] === 'typo3-cms-extension') {
+            return 'extension';
+        }
+
+        return 'package';
     }
 
     protected function getTypeShort(array $composerContent): string
     {
         $typeLong = $this->getTypeLong($composerContent);
 
-        if ($typeLong === 'extension') {
-            return 'e';
-        }
-
         if ($typeLong === 'core-extension') {
             return 'c';
+        }
+
+        if (in_array($typeLong, ['extension', 'package'])) {
+            return 'p';
         }
 
         throw new \Exception('Unkown long type defined: "' . $typeLong . '".', 1533915213);

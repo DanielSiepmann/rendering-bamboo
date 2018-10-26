@@ -203,7 +203,7 @@ class PrepareDeploymentCommandTest extends TestCase
                 'expectedFileContent' => implode(PHP_EOL, [
                     '#/bin/bash',
                     'type_long=extension',
-                    'type_short=e',
+                    'type_short=p',
                     'vendor=vendor',
                     'name=package-name',
                     'version=10.1.2',
@@ -218,7 +218,37 @@ class PrepareDeploymentCommandTest extends TestCase
                 'expectedFileContent' => implode(PHP_EOL, [
                     '#/bin/bash',
                     'type_long=extension',
-                    'type_short=e',
+                    'type_short=p',
+                    'vendor=vendor',
+                    'name=package-name',
+                    'version=10.1.2',
+                ]),
+            ],
+            '3rd Party library' => [
+                'composerJsonContent' => [
+                    'type' => 'library',
+                    'name' => 'vendor/package-name',
+                ],
+                'versionString' => '10.1.2',
+                'expectedFileContent' => implode(PHP_EOL, [
+                    '#/bin/bash',
+                    'type_long=package',
+                    'type_short=p',
+                    'vendor=vendor',
+                    'name=package-name',
+                    'version=10.1.2',
+                ]),
+            ],
+            '3rd Party project' => [
+                'composerJsonContent' => [
+                    'type' => 'project',
+                    'name' => 'vendor/package-name',
+                ],
+                'versionString' => '10.1.2',
+                'expectedFileContent' => implode(PHP_EOL, [
+                    '#/bin/bash',
+                    'type_long=package',
+                    'type_short=p',
                     'vendor=vendor',
                     'name=package-name',
                     'version=10.1.2',
@@ -233,7 +263,7 @@ class PrepareDeploymentCommandTest extends TestCase
                 'expectedFileContent' => implode(PHP_EOL, [
                     '#/bin/bash',
                     'type_long=extension',
-                    'type_short=e',
+                    'type_short=p',
                     'vendor=vendor',
                     'name=package-name',
                     'version=latest',
@@ -292,13 +322,6 @@ class PrepareDeploymentCommandTest extends TestCase
                     'type' => 'typo3-cms-framework',
                 ],
                 'expectedMessage' => '<error>No name defined.</error>',
-            ],
-            'Type unkown' => [
-                'composerJsonContent' => [
-                    'name' => 'typo3/cms-indexed-search',
-                    'type' => 'package',
-                ],
-                'expectedMessage' => '<error>Unkown type defined: "package".</error>',
             ],
             'Vendor undefined' => [
                 'composerJsonContent' => [
